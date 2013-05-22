@@ -58,6 +58,7 @@ function! vim_redis#execute(...) range
   let line = line('$') - 1
   execute "silent ".line."read ".command
 
+  normal G
   setlocal nomodifiable
   execute win . "wincmd w"
 endfunction
