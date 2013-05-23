@@ -1,7 +1,7 @@
 " Redis syntax file
 " Language:    Redis
 " Maintainer:  Junegunn Choi
-" Version:     -1
+" Version:     0
 " Last Change: 2013 May
 
 if exists('b:current_syntax') && b:current_syntax == 'redis'
@@ -24,19 +24,24 @@ syn match redisServerCommand      /\<\%(bgrewriteaof\|bgsave\|client kill\|clien
 syn match redisKeyCommand         /\<\%(del\|dump\|exists\|expire\|expireat\|keys\|migrate\|move\|object\|persist\|pexpire\|pexpireat\|pttl\|randomkey\|rename\|renamenx\|restore\|sort\|ttl\|type\)\>/
 
 syn match redisPrompt /^redis.\{-}>/
-syn match redisResponseType /^([^)]\{-})/
-syn match redisError /^(error).*/
+syn match redisResponseType /([^)]\{-})/
 syn match redisNumber /-\?[0-9.]\+/
 syn match redisOK "OK"
 
-syn region redisString start='"' skip=/\\"/ end='"' contains=redisScript
-syn region redisScript matchGroup=redisLuaScript start=/\<\%(eval\|script exists\|script load\)\s\s\{-}"/ end='"' contains=@LUA
+syn region redisString start='"' skip='\\"' end='"' oneline contains=redisScript
+syn region redisString start="'" skip="\\'" end="'" oneline contains=redisScript
+syn region redisScript matchGroup=redisLuaScript start=/\<\%(eval\|script exists\|script load\)\s\s\{-}"/ end='"' oneline contains=@LUA
+syn region redisResponseNumbered start='^[0-9]\+)' end='$' contains=redisString,redisResponseType,redisNumber
+
+syn region redisError matchGroup=redisResponseError start='(error)\s*' end='$' contains=redisErrorMessage display
+syn match redisErrorMessage /.*/ contained
 
 " hell yeah
 hi def link redisOK                 Keyword
 hi def link redisPrompt             Comment
 hi def link redisResponseType       Type
-hi def link redisError              Error
+hi def link redisResponseError      Todo
+hi def link redisErrorMessage       Error
 hi def link redisNumber             Number
 hi def link redisString             String
 hi def link redisStringCommand      Function

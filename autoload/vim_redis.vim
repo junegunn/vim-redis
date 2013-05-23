@@ -37,10 +37,9 @@ function! vim_redis#execute(...) range
   let win = winnr()
   for line in range(a:firstline, a:lastline)
     let cmd = substitute(getline(line), '^\s*redis.\{-}>\s*', '', '')
-    if cmd =~ '^\%((\|OK\)'
-      continue
+    if cmd !~ '^OK' && cmd =~ '^\s*[a-zA-Z]'
+      silent echo cmd
     endif
-    silent echo cmd
   endfor
   silent redir END
 
@@ -55,6 +54,10 @@ function! vim_redis#execute(...) range
     setlocal modifiable
   endif
 
+  if exists("g:vim_redis_paste_command") && g:vim_redis_paste_command
+    let line = line('$') - 1
+    execute "silent ".line."read !cat /tmp/vim-redis | grep -v '^$'"
+  endif
   let line = line('$') - 1
   execute "silent ".line."read ".command
 
