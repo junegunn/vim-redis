@@ -18,26 +18,26 @@ syn match redisSetCommand         /\<\%(sadd\|scard\|sdiff\|sdiffstore\|sinter\|
 syn match redisSortedSetCommand   /\<\%(zadd\|zcard\|zcount\|zincrby\|zinterstore\|zrange\|zrangebyscore\|zrank\|zrem\|zremrangebyrank\|zremrangebyscore\|zrevrange\|zrevrangebyscore\|zrevrank\|zscore\|zunionstore\)\>/
 syn match redisPubSubCommand      /\<\%(publish\|subscribe\|unsubscribe\|psubscribe\|punsubscribe\)\>/
 syn match redisTransactionCommand /\<\%(discard\|exec\|multi\|unwatch\|watch\)\>/
-syn match redisScriptingCommand   /\<\%(eval\|evalsha\|script exists\|script flush\|script kill\|script load\)\>/
+syn match redisScriptingCommand   /\<\%(eval\|evalsha\|script \+exists\|script \+flush\|script \+kill\|script \+load\)\>/
 syn match redisConnectionCommand  /\<\%(auth\|ping\|echo\|quit\|select\)\>/
-syn match redisServerCommand      /\<\%(bgrewriteaof\|bgsave\|client kill\|client list\|client getname\|client setname\|config get\|config set\|config resetstat\|dbsize\|debug object\|debug segfault\|flushall\|flushdb\|info\|lastsave\|shutdown\|slaveof\|slowlog\|sync\|time\|monitor\|save\)\>/
+syn match redisServerCommand      /\<\%(bgrewriteaof\|bgsave\|client \+kill\|client \+list\|client \+getname\|client \+setname\|config \+get\|config \+set\|config \+resetstat\|dbsize\|debug \+object\|debug \+segfault\|flushall\|flushdb\|info\|lastsave\|shutdown\|slaveof\|slowlog\|sync\|time\|monitor\|save\)\>/
 syn match redisKeyCommand         /\<\%(del\|dump\|exists\|expire\|expireat\|keys\|migrate\|move\|object\|persist\|pexpire\|pexpireat\|pttl\|randomkey\|rename\|renamenx\|restore\|sort\|ttl\|type\)\>/
+syn match redisKeyword /\<\%(withscores\|weights\|ok\|aggregate \+\%(min\|sum\|max\)\|save\|no \+save\|\)\>/
 
 syn match redisPrompt /^redis.\{-}>/
 syn match redisResponseType /([^)]\{-})/
-syn match redisNumber /-\?[0-9.]\+/
-syn match redisOK "OK"
+syn match redisNumber /\<-\?[0-9.]\+\>/
 
 syn region redisString start='"' skip='\\"' end='"' oneline contains=redisScript
 syn region redisString start="'" skip="\\'" end="'" oneline contains=redisScript
-syn region redisScript matchGroup=redisLuaScript start=/\<\%(eval\|script exists\|script load\)\s\s\{-}"/ end='"' oneline contains=@LUA
+syn region redisScript matchGroup=redisLuaScript start=/\<\%(eval\|script \+exists\|script \+load\)\s\s\{-}"/ end='"' oneline contains=@LUA
 syn region redisResponseNumbered start='^[0-9]\+)' end='$' contains=redisString,redisResponseType,redisNumber
 
 syn region redisError matchGroup=redisResponseError start='(error)\s*' end='$' contains=redisErrorMessage display
 syn match redisErrorMessage /.*/ contained
 
 " hell yeah
-hi def link redisOK                 Keyword
+hi def link redisKeyword            Keyword
 hi def link redisPrompt             Comment
 hi def link redisResponseType       Type
 hi def link redisResponseError      Todo
