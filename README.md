@@ -10,8 +10,7 @@ vim-redis (WIP)
   " let g:vim_redis_host = 'localhost'
   " let g:vim_redis_port = '6379'
   " let g:vim_redis_auth = 'xxx'
-
-  let g:vim_redis_paste_command = 1
+  " let g:vim_redis_paste_command = 1
 
   " Execute current line
   noremap <slient> <leader>re :RedisExecute<cr>
@@ -20,5 +19,9 @@ vim-redis (WIP)
   vnoremap <slient> <leader>re :RedisExecute<cr>gv
 
   " Close output window
-  noremap <slient> <leader>rq :RedisClose<cr>
+  noremap <slient> <leader>rq :RedisQuit<cr>
+
+  " With connection info (host, port, auth)
+  " noremap  <slient> <leader>re :RedisExecute localhost 6379 xxx<cr>
+  " vnoremap <slient> <leader>re :RedisExecute localhost 6379 xxx<cr>gv
 ```

@@ -5,7 +5,7 @@ let g:vim_redis_loaded = 1
 
 let s:result_win = 0
 
-function! vim_redis#close()
+function! vim_redis#quit()
   if bufexists("[vim-redis]")
     execute s:result_win . "wincmd w"
     execute ":q"
