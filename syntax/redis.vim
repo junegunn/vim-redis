@@ -25,7 +25,8 @@ syn match redisKeyCommand         /\<\%(del\|dump\|exists\|expire\|expireat\|key
 syn match redisKeyword /\<\%(withscores\|weights\|ok\|aggregate \+\%(min\|sum\|max\)\|save\|no \+save\|\)\>/
 
 syn match redisPrompt /^redis.\{-}>/
-syn match redisResponseType /([^)]\{-})/
+syn match redisResponseType /^\s*([^)]\{-})/
+syn match redisResponseType /([^)]\{-})/ contained
 syn match redisNumber /\<-\?[0-9.]\+\>/
 
 syn region redisString start='"' skip='\\"' end='"' oneline contains=redisScript
