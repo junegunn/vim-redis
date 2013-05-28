@@ -21,7 +21,7 @@ function! vim_redis#open()
     end
     setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap nonu
     setf redis
-    silent f [vim-redis]
+    silent f \[vim-redis\]
     let s:result_win = winnr()
   endif
 endfunction
