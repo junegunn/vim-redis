@@ -12,6 +12,29 @@ function! vim_redis#quit()
   endif
 endfunction
 
+function! vim_redis#open()
+  if !bufexists("[vim-redis]")
+    if exists("g:vim_redis_output_position") && g:vim_redis_output_position == 'b'
+      botright new
+    else
+      vertical rightbelow new
+    end
+    setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap nonu
+    setf redis
+    silent f [vim-redis]
+    let s:result_win = winnr()
+  endif
+endfunction
+
+function! vim_redis#wipe()
+  if bufexists("[vim-redis]")
+    let win = winnr()
+    call vim_redis#quit()
+    call vim_redis#open()
+    execute win . "wincmd w"
+  endif
+endfunction
+
 function! vim_redis#execute(...) range
   let command = '!cat /tmp/vim-redis | grep -v "^$" | FAKETTY=1 redis-cli'
 
@@ -43,24 +66,21 @@ function! vim_redis#execute(...) range
   endfor
   silent redir END
 
-  if !bufexists("[vim-redis]")
-    botright new
-    setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
-    setf redis
-    execute "f [vim-redis]"
-    let s:result_win = winnr()
-  else
-    execute s:result_win . "wincmd w"
-    setlocal modifiable
-  endif
+  call vim_redis#open()
+  execute s:result_win . "wincmd w"
+  setlocal modifiable
 
   if exists("g:vim_redis_paste_command") && g:vim_redis_paste_command
-    let line = line('$') - 1
-    let paste_cmd = "silent ".line."read !cat /tmp/vim-redis | grep -v '^$'"
+    let line = line('$')
+    let paste_cmd = "silent ".line - 1."read !cat /tmp/vim-redis | grep -v '^$'"
     if exists("g:vim_redis_paste_command_prefix")
       let paste_cmd = paste_cmd . " | sed 's|^|".g:vim_redis_paste_command_prefix."|'"
     endif
     execute paste_cmd
+
+    syntax clear redisHighlight
+    " contains=ALLBUT,redisErrorMessage
+    execute 'syntax region redisHighlight start=/\%' . line . 'l/ end=/\%' . line('$') . 'l/'
   endif
   let line = line('$') - 1
   execute "silent ".line."read ".command

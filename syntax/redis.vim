@@ -57,5 +57,6 @@ hi def link redisLuaScript          PreProc
 hi def link redisConnectionCommand  Exception
 hi def link redisServerCommand      Debug
 hi def link redisKeyCommand         Statement
+hi def link redisHighlight          Todo
 
 let b:current_syntax = 'redis'
