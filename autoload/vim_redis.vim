@@ -36,7 +36,8 @@ function! vim_redis#wipe()
 endfunction
 
 function! vim_redis#execute(...) range
-  let command = '!cat /tmp/vim-redis | grep -v "^$" | FAKETTY=1 redis-cli'
+  let temp = tempname()
+  let command = '!cat '. temp .' | grep -v "^$" | FAKETTY=1 redis-cli'
 
   if exists('a:1')
     let command = command . ' -h ' . a:1
@@ -50,7 +51,7 @@ function! vim_redis#execute(...) range
     let command = command . ' -p ' . g:vim_redis_port
   endif
 
-  silent redir! > /tmp/vim-redis
+  execute "silent redir! > ".temp
   let auth = exists('a:3') ? a:3 : (exists('g:vim_redis_auth') ? g:vim_redis_auth : '')
   if !empty(auth)
     silent echo 'auth ' . auth
@@ -72,7 +73,7 @@ function! vim_redis#execute(...) range
 
   if exists("g:vim_redis_paste_command") && g:vim_redis_paste_command
     let line = line('$')
-    let paste_cmd = "silent ".line - 1."read !cat /tmp/vim-redis | grep -v '^$'"
+    let paste_cmd = "silent ".line - 1."read !cat ".temp." | grep -v '^$'"
     if exists("g:vim_redis_paste_command_prefix")
       let paste_cmd = paste_cmd . " | sed 's|^|".g:vim_redis_paste_command_prefix."|'"
     endif
