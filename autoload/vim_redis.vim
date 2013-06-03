@@ -73,6 +73,7 @@ function! vim_redis#execute(...) range
 
   if exists("g:vim_redis_paste_command") && g:vim_redis_paste_command
     let line = line('$')
+    normal! G
     let paste_cmd = "silent ".line - 1."read !cat ".temp." | grep -v '^$'"
     if exists("g:vim_redis_paste_command_prefix")
       let paste_cmd = paste_cmd . " | sed 's|^|".g:vim_redis_paste_command_prefix."|'"
