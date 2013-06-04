@@ -1,7 +1,7 @@
-if exists("g:vim_redis_loaded")
+if exists("g:loaded_vim_redis")
   finish
 endif
-let g:vim_redis_loaded = 1
+let g:loaded_vim_redis = 1
 
 let s:result_win = 0
 
@@ -14,10 +14,10 @@ endfunction
 
 function! vim_redis#open()
   if !bufexists("[vim-redis]")
-    if exists("g:vim_redis_output_position") && g:vim_redis_output_position == 'b'
-      botright new
-    else
+    if get(g:, 'vim_redis_output_position', 'r') == 'r'
       vertical rightbelow new
+    else
+      botright new
     end
     setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap nonu
     setf redis
@@ -37,7 +37,7 @@ endfunction
 
 function! vim_redis#execute(...) range
   let temp = tempname()
-  let command = '!cat '. temp .' | grep -v "^$" | FAKETTY=1 redis-cli'
+  let command = '!grep -v "^$" ' .temp. ' | FAKETTY=1 redis-cli'
 
   if exists('a:1')
     let command = command . ' -h ' . a:1
@@ -52,7 +52,7 @@ function! vim_redis#execute(...) range
   endif
 
   execute "silent redir! > ".temp
-  let auth = exists('a:3') ? a:3 : (exists('g:vim_redis_auth') ? g:vim_redis_auth : '')
+  let auth = exists('a:3') ? a:3 : get(g:, 'vim_redis_auth', '')
   if !empty(auth)
     silent echo 'auth ' . auth
     let command = command . " | tail -n+2"
@@ -71,12 +71,15 @@ function! vim_redis#execute(...) range
   execute s:result_win . "wincmd w"
   setlocal modifiable
 
-  if exists("g:vim_redis_paste_command") && g:vim_redis_paste_command
+  if get(g:, 'vim_redis_paste_command', 0)
     let line = line('$')
     normal! G
-    let paste_cmd = "silent ".line - 1."read !cat ".temp." | grep -v '^$'"
+    let paste_cmd = "silent ".line - 1."read !grep -v '^$' ".temp
     if exists("g:vim_redis_paste_command_prefix")
       let paste_cmd = paste_cmd . " | sed 's|^|".g:vim_redis_paste_command_prefix."|'"
+      if !empty(auth)
+        let paste_cmd = paste_cmd . " | tail -n+2"
+      endif
     endif
     execute paste_cmd
 
