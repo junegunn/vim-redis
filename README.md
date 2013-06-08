@@ -16,14 +16,14 @@ Redis plugin for Vim. (Why?)
 " let g:vim_redis_output_position = 'b'
 
 "" Paste command on output window
-let g:vim_redis_paste_command = 0
+let g:vim_redis_paste_command = 1
 let g:vim_redis_paste_command_prefix = '> '
 
 " Execute Redis command on the current line
 noremap <slient> <leader>re :RedisExecute<cr>
 
 " Execute commands on multiple lines at once while in visual mode
-vnoremap <slient> <leader>re :RedisExecute<cr>gv
+vnoremap <slient> <leader>re :RedisExecuteVisual<cr>gv
 
 " Clear output window
 noremap <slient> <leader>rw :RedisWipe<cr>

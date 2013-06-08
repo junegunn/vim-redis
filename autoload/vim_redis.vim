@@ -21,7 +21,7 @@ function! vim_redis#open()
     end
     setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap nonu
     setf redis
-    silent f \[vim-redis\]
+    silent! f \[vim-redis\]
     let s:result_win = winnr()
   endif
 endfunction
@@ -35,7 +35,7 @@ function! vim_redis#wipe()
   endif
 endfunction
 
-function! vim_redis#execute(...) range
+function! vim_redis#execute(vis, ...) range
   let temp = tempname()
   let command = '!grep -v "^$" ' .temp. ' | FAKETTY=1 redis-cli'
 
@@ -51,21 +51,33 @@ function! vim_redis#execute(...) range
     let command = command . ' -p ' . g:vim_redis_port
   endif
 
-  execute "silent redir! > ".temp
   let auth = exists('a:3') ? a:3 : get(g:, 'vim_redis_auth', '')
   if !empty(auth)
-    silent echo 'auth ' . auth
+    silent! echo 'auth ' . auth
     let command = command . " | tail -n+2"
   endif
 
   let win = winnr()
-  for line in range(a:firstline, a:lastline)
-    let cmd = substitute(getline(line), '^\s*redis.\{-}>\s*', '', '')
+  if a:vis
+    let prev_a = getreg('a')
+    silent! normal! gv"ay
+    let lines = split(getreg('a'), '\n')
+    call setreg('a', prev_a)
+  else
+    let lines = []
+    for line in range(a:firstline, a:lastline)
+      call add(lines, getline(line))
+    endfor
+  endif
+
+  silent! execute 'redir! > '.temp
+  for line in lines
+    let cmd = substitute(line, '^\s*redis.\{-}>\s*', '', '')
     if cmd !~ '^OK' && cmd =~ '^\s*[a-zA-Z]'
-      silent echo cmd
+      silent! echo cmd
     endif
   endfor
-  silent redir END
+  silent! redir END
 
   call vim_redis#open()
   execute s:result_win . "wincmd w"
@@ -74,21 +86,21 @@ function! vim_redis#execute(...) range
   if get(g:, 'vim_redis_paste_command', 0)
     let line = line('$')
     normal! G
-    let paste_cmd = "silent ".line - 1."read !grep -v '^$' ".temp
+    let paste_cmd = line - 1."read !grep -v '^$' ".temp
     if exists("g:vim_redis_paste_command_prefix")
       let paste_cmd = paste_cmd . " | sed 's|^|".g:vim_redis_paste_command_prefix."|'"
       if !empty(auth)
         let paste_cmd = paste_cmd . " | tail -n+2"
       endif
     endif
-    execute paste_cmd
+    silent! execute paste_cmd
 
     syntax clear redisHighlight
     " contains=ALLBUT,redisErrorMessage
     execute 'syntax region redisHighlight start=/\%' . line . 'l/ end=/\%' . line('$') . 'l/'
   endif
   let line = line('$') - 1
-  execute "silent ".line."read ".command
+  silent! execute line."read ".command
 
   normal G
   setlocal nomodifiable
